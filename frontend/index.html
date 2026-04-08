@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Brain AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ── Themes ── */
+        body.theme-purple {
+            --accent: #a78bfa; --accent-dark: #7c3aed; --accent-btn: #6d28d9;
+            --bg: #0f0f1a; --sidebar: #16162a; --card: #16162a;
+            --msg-ai: #1e1e3a; --border: #2a2a4a; --user-msg: #4c1d95;
+        }
+        body.theme-ocean {
+            --accent: #38bdf8; --accent-dark: #0284c7; --accent-btn: #0369a1;
+            --bg: #0a0f1a; --sidebar: #0f172a; --card: #0f172a;
+            --msg-ai: #1e293b; --border: #1e3a5f; --user-msg: #1e3a5f;
+        }
+        body.theme-forest {
+            --accent: #4ade80; --accent-dark: #16a34a; --accent-btn: #15803d;
+            --bg: #0a120a; --sidebar: #0f1f0f; --card: #0f1f0f;
+            --msg-ai: #1a2e1a; --border: #1a3a1a; --user-msg: #1a3a1a;
+        }
+        body.theme-sunset {
+            --accent: #fb923c; --accent-dark: #ea580c; --accent-btn: #c2410c;
+            --bg: #1a0f0a; --sidebar: #2a1505; --card: #2a1505;
+            --msg-ai: #3a1f0a; --border: #4a2510; --user-msg: #7c2d12;
+        }
+        body.theme-rose {
+            --accent: #f472b6; --accent-dark: #db2777; --accent-btn: #be185d;
+            --bg: #1a0a12; --sidebar: #2a0f1a; --card: #2a0f1a;
+            --msg-ai: #3a1a2a; --border: #4a1a3a; --user-msg: #831843;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px;
+            min-width: 240px;
+            background: var(--sidebar);
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 20px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span { color: #fff; }
+
+        .nav-section {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 8px 4px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #888;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .nav-btn:hover { background: var(--border); color: #fff; }
+        .nav-btn.active { background: var(--border); color: var(--accent); font-weight: 600; }
+        .nav-btn .icon { font-size: 16px; min-width: 20px; text-align: center; }
+
+        /* Theme Switcher */
+        .theme-section {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .theme-label {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px 8px;
+        }
+
+        .theme-dots {
+            display: flex;
+            gap: 8px;
+            padding: 0 8px;
+            flex-wrap: wrap;
+        }
+
+        .theme-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .theme-dot:hover { transform: scale(1.2); }
+        .theme-dot.active { border-color: #fff; transform: scale(1.1); }
+        .theme-dot.purple { background: #7c3aed; }
+        .theme-dot.ocean { background: #0284c7; }
+        .theme-dot.forest { background: #16a34a; }
+        .theme-dot.sunset { background: #ea580c; }
+        .theme-dot.rose { background: #db2777; }
+
+        /* ── Main ── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* ── Header ── */
+        .header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-title { font-size: 16px; font-weight: 600; }
+        .header-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+        .status-badge {
+            background: #1a2a1a;
+            color: #4ade80;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            border: 1px solid #2a4a2a;
+            white-space: nowrap;
+        }
+
+        /* ── Panels ── */
+        .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .panel.active { display: flex; }
+
+        /* ── Chat ── */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 68%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.65;
+            animation: fadeIn 0.25s ease;
+            word-wrap: break-word;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: var(--user-msg);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            background: var(--msg-ai);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .message.crisis {
+            border: 1px solid #ef4444 !important;
+            background: #2a1a1a !important;
+        }
+
+        .persona-tag {
+            font-size: 10px;
+            color: var(--accent);
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .typing {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--msg-ai);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+            border: 1px solid var(--border);
+        }
+
+        .typing span {
+            width: 7px; height: 7px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: bounce 1.2s infinite;
+        }
+
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .chat-input-area {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--msg-ai);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            min-height: 48px;
+            max-height: 120px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .chat-input:focus { border-color: var(--accent); }
+
+        .send-btn {
+            background: var(--accent-dark);
+            border: none;
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover { background: var(--accent-btn); transform: scale(1.05); }
+        .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+        /* ── Scrollable Panels ── */
+        .scroll-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .signal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .signal-item {
+            background: var(--msg-ai);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .signal-score { font-size: 28px; font-weight: 700; color: var(--accent); }
+        .signal-label { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .mood-log-form { display: flex; flex-direction: column; gap: 10px; }
+
+        .mood-select, .mood-note, .memory-search {
+            background: var(--msg-ai);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .mood-select:focus, .mood-note:focus, .memory-search:focus {
+            border-color: var(--accent);
+        }
+
+        .score-slider { width: 100%; accent-color: var(--accent); margin: 4px 0; }
+
+        .action-btn {
+            background: var(--accent-dark);
+            border: none;
+            border-radius: 10px;
+            padding: 11px 20px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .action-btn:hover { background: var(--accent-btn); }
+
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .chip {
+            background: var(--msg-ai);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 12px;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .chip:hover { background: var(--border); color: #fff; }
+
+        .memory-result {
+            background: var(--msg-ai);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #e2e8f0;
+            display: none;
+            margin-top: 12px;
+        }
+
+        /* ── Persona ── */
+        .persona-card {
+            background: var(--card);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .persona-avatar {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 14px;
+        }
+
+        .persona-name { font-size: 22px; font-weight: 700; color: var(--accent); }
+        .persona-type { font-size: 13px; color: #888; margin-top: 4px; }
+
+        .persona-example {
+            background: var(--msg-ai);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #e2e8f0;
+            line-height: 1.65;
+            text-align: left;
+            border-left: 3px solid var(--accent);
+        }
+        .formatted-response { line-height: 1.8; }
+        .bullet {
+            display: flex;
+            gap: 10px;
+            margin: 5px 0;
+            align-items: flex-start;
+        }
+        .bullet-dot {
+            color: var(--accent);
+            font-size: 16px;
+            min-width: 14px;
+            margin-top: 1px;
+        }
+        .bullet-num {
+            color: var(--accent);
+            font-weight: 700;
+            min-width: 22px;
+        }
+        .resp-header {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 15px;
+            margin: 12px 0 6px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+        .para-gap { height: 10px; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    </style>
+</head>
+<body class="theme-purple">
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">🧠 Second<span>Brain</span></div>
+
+    <div class="nav-section">Companion</div>
+    <button class="nav-btn active" onclick="showPanel('chat')" id="nav-chat">
+        <span class="icon">💬</span> Talk to Anya
+    </button>
+
+    <div class="nav-section">Wellness</div>
+    <button class="nav-btn" onclick="showPanel('mood')" id="nav-mood">
+        <span class="icon">📊</span> Mood & Signals
+    </button>
+
+    <div class="nav-section">Memory</div>
+    <button class="nav-btn" onclick="showPanel('memory')" id="nav-memory">
+        <span class="icon">🔍</span> My Memory
+    </button>
+    <div class="nav-section">Tasks</div>
+    <button class="nav-btn" onclick="showPanel('tasks')" id="nav-tasks">
+        <span class="icon">✅</span> My Tasks
+    </button>
+    <button class="nav-btn" onclick="showPanel('persona')" id="nav-persona">
+        <span class="icon">🎭</span> My Persona
+    </button>
+
+    <div class="nav-section">Account</div>
+    <button class="nav-btn" onclick="showPanel('profile')" id="nav-profile">
+        <span class="icon">👤</span> My Profile
+    </button>
+
+    <!-- Theme Switcher -->
+    <div class="theme-section">
+        <div class="theme-label">Theme</div>
+        <div class="theme-dots">
+            <div class="theme-dot purple active" onclick="setTheme('purple')" title="Purple"></div>
+            <div class="theme-dot ocean" onclick="setTheme('ocean')" title="Ocean"></div>
+            <div class="theme-dot forest" onclick="setTheme('forest')" title="Forest"></div>
+            <div class="theme-dot sunset" onclick="setTheme('sunset')" title="Sunset"></div>
+            <div class="theme-dot rose" onclick="setTheme('rose')" title="Rose"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <div class="header-title" id="header-title">Talk to Anya</div>
+            <div class="header-sub" id="header-sub">Your personal wellness companion</div>
+        </div>
+        <div class="status-badge">● Live</div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="panel active" id="panel-chat">
+        <!-- Chat Panel -->
+
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-area">
+            <textarea
+                class="chat-input"
+                id="chat-input"
+                placeholder="Talk to Anya or tell her a task..."
+                rows="1"
+                onkeydown="handleKey(event)"
+                oninput="autoResize(this)"
+            ></textarea>
+            <button
+                onclick="toggleChatVoice()"
+                id="chat-voice-btn"
+                style="
+                    background:var(--msg-ai);
+                    border:1px solid var(--border);
+                    border-radius:12px;
+                    width:48px;
+                    height:48px;
+                    cursor:pointer;
+                    font-size:20px;
+                    flex-shrink:0;
+                "
+            >🎤</button>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+                
+
+
+    <!-- Mood Panel -->
+    <div class="panel" id="panel-mood">
+        <div class="scroll-panel">
+            <div class="card">
+                <div class="card-title">Live Signals</div>
+                <div class="signal-grid">
+                    <div class="signal-item">
+                        <div class="signal-score" id="email-score">—</div>
+                        <div class="signal-label">Email Stress</div>
+                    </div>
+                    <div class="signal-item">
+                        <div class="signal-score" id="cal-score">—</div>
+                        <div class="signal-label">Calendar Load</div>
+                    </div>
+                </div>
+                <div style="margin-top:14px; color:#888; font-size:13px; line-height:1.5" id="signal-message">
+                    Loading...
+                </div>
+                <button class="action-btn" style="margin-top:14px; width:100%" onclick="loadSignals()">
+                    🔄 Refresh Signals
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Log Your Mood</div>
+                <div class="mood-log-form">
+                    <select class="mood-select" id="mood-select">
+                        <option value="happy">😊 Happy</option>
+                        <option value="neutral">😐 Neutral</option>
+                        <option value="anxious">😰 Anxious</option>
+                        <option value="stressed">😤 Stressed</option>
+                        <option value="sad">😢 Sad</option>
+                        <option value="overwhelmed">😵 Overwhelmed</option>
+                    </select>
+                    <input type="range" class="score-slider" id="mood-score" min="1" max="10" value="5">
+                    <div style="text-align:center; color:var(--accent); font-size:13px;">
+                        Score: <span id="score-display">5</span>/10
+                    </div>
+                    <textarea class="mood-note" id="mood-note"
+                        placeholder="What's on your mind?" rows="3"></textarea>
+                    <button class="action-btn" onclick="logMood()">✓ Log Mood</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Mood Analysis</div>
+                <div id="mood-analysis-text"
+                    style="color:#888; font-size:13px; line-height:1.6">
+                    Click analyze to see your pattern
+                </div>
+                <button class="action-btn" style="margin-top:14px; width:100%"
+                    onclick="analyzeMood()">
+                    🧠 Analyze My Mood
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Panel -->
+    <div class="panel" id="panel-memory">
+        <div class="scroll-panel">
+            <div class="card">
+                <div class="card-title">Ask Your Memory</div>
+                <input type="text" class="memory-search" id="memory-question"
+                    placeholder="What did I learn? What promises did I make?"
+                    onkeydown="if(event.key==='Enter') askMemory()">
+                <button class="action-btn" style="margin-top:10px; width:100%"
+                    onclick="askMemory()">🔍 Search Memory</button>
+                <div class="memory-result" id="memory-result"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Quick Questions</div>
+                <div class="quick-chips">
+                    <button class="chip" onclick="quickAsk('How am I feeling lately?')">
+                        How am I feeling?
+                    </button>
+                    <button class="chip" onclick="quickAsk('What are my upcoming important events?')">
+                        Upcoming events
+                    </button>
+                    <button class="chip" onclick="quickAsk('What have I been stressed about?')">
+                        My stress sources
+                    </button>
+                    <button class="chip" onclick="quickAsk('What did I save in my notes?')">
+                        My notes
+                    </button>
+                    <button class="chip" onclick="quickAsk('What promises did I make recently?')">
+                        My promises
+                    </button>
+                    <button class="chip" onclick="quickAsk('Give me a summary of my week')">
+                        Week summary
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Task Panel -->
+    <div class="panel" id="panel-tasks">
+        <div class="scroll-panel">
+
+            <!-- Voice + Text Input -->
+            <div class="card">
+                <div class="card-title">Add Task</div>
+                <div style="font-size:13px; color:#888; margin-bottom:16px; line-height:1.6">
+                    Type or speak naturally — Anya will add it to your calendar
+                </div>
+
+                <!-- Examples -->
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px">
+                    <div class="chip" onclick="setTaskInput('Call mom Sunday at 5pm')">
+                        📞 Call mom Sunday 5pm
+                    </div>
+                    <div class="chip" onclick="setTaskInput('Dentist appointment tomorrow 10am')">
+                        🦷 Dentist tomorrow 10am
+                    </div>
+                    <div class="chip" onclick="setTaskInput('Team meeting Monday 2pm')">
+                        👥 Team meeting Monday 2pm
+                    </div>
+                    <div class="chip" onclick="setTaskInput('Buy groceries today')">
+                        🛒 Buy groceries today
+                    </div>
+                </div>
+
+                <!-- Voice + Text Input Area -->
+                <div style="display:flex; gap:10px; align-items:flex-end">
+                    <textarea
+                        class="chat-input"
+                        id="task-input"
+                        placeholder="Tell Anya your task... e.g. 'Gym tomorrow at 7am'"
+                        rows="2"
+                        oninput="autoResize(this)"
+                        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitTask()}"
+                        style="flex:1"
+                    ></textarea>
+                    <button
+                        id="voice-btn"
+                        onclick="toggleVoice()"
+                        style="
+                            background:var(--msg-ai);
+                            border:1px solid var(--border);
+                            border-radius:12px;
+                            width:48px; height:48px;
+                            cursor:pointer;
+                            font-size:20px;
+                            flex-shrink:0;
+                            transition:all 0.2s;
+                        "
+                        title="Voice input"
+                    >🎤</button>
+                    <button
+                        onclick="submitTask()"
+                        class="send-btn"
+                        id="task-send-btn"
+                    >➤</button>
+                </div>
+
+                <!-- Voice Status -->
+                <div id="voice-status" style="
+                    display:none;
+                    margin-top:10px;
+                    padding:10px 14px;
+                    background:var(--msg-ai);
+                    border-radius:10px;
+                    font-size:13px;
+                    color:var(--accent);
+                    border:1px solid var(--accent);
+                    text-align:center;
+                ">
+                    🎤 Listening... speak your task
+                </div>
+
+                <!-- Task Result -->
+                <div id="task-result" style="
+                    display:none;
+                    margin-top:14px;
+                    padding:14px;
+                    background:var(--msg-ai);
+                    border-radius:12px;
+                    font-size:14px;
+                    line-height:1.6;
+                    border:1px solid var(--border);
+                "></div>
+            </div>
+
+            <!-- Task List -->
+            <div class="card">
+                <div class="card-title">Upcoming Tasks</div>
+                <div id="task-list">
+                    <div style="color:#888; font-size:13px">Loading tasks...</div>
+                </div>
+                <button class="action-btn" style="margin-top:14px; width:100%"
+                    onclick="loadTasks()">
+                    🔄 Refresh
+                </button>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Profile Panel -->
+    <div class="panel" id="panel-profile">
+        <div class="scroll-panel">
+
+            <!-- User Info -->
+            <div class="card">
+                <div class="card-title">My Profile</div>
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px">
+                    <div style="
+                        width:64px; height:64px;
+                        background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+                        border-radius:50%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:28px;
+                        flex-shrink:0;
+                    ">👤</div>
+                    <div>
+                        <div id="profile-name" style="font-size:18px; font-weight:700">Loading...</div>
+                        <div id="profile-email" style="font-size:13px; color:#888; margin-top:2px"></div>
+                        <div id="profile-joined" style="font-size:12px; color:#555; margin-top:4px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Companion -->
+            <div class="card">
+                <div class="card-title">My Companion</div>
+                <div style="display:flex; align-items:center; gap:14px">
+                    <div style="
+                        width:48px; height:48px;
+                        background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+                        border-radius:50%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:22px;
+                    ">🎭</div>
+                    <div>
+                        <div id="profile-persona-name" style="font-size:16px; font-weight:600"></div>
+                        <div id="profile-persona-type" style="font-size:12px; color:#888; margin-top:2px"></div>
+                    </div>
+                </div>
+                <div id="profile-persona-example" style="
+                    margin-top:14px;
+                    padding:12px;
+                    background:var(--msg-ai);
+                    border-radius:10px;
+                    font-size:13px;
+                    color:#888;
+                    line-height:1.6;
+                    border-left:3px solid var(--accent);
+                "></div>
+                <button class="action-btn" style="margin-top:14px; width:100%"
+                    onclick="showPanel('persona')">
+                    ✏️ Change Persona
+                </button>
+            </div>
+
+            <!-- Data Privacy -->
+            <div class="card">
+                <div class="card-title">My Data</div>
+                <div style="display:flex; flex-direction:column; gap:10px">
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:12px;
+                        background:var(--msg-ai);
+                        border-radius:10px;
+                        border:1px solid var(--border);
+                    ">
+                        <div>
+                            <div style="font-size:14px; font-weight:600">📧 Emails</div>
+                            <div style="font-size:12px; color:#888">Synced from Gmail</div>
+                        </div>
+                        <div id="email-count" style="color:var(--accent); font-weight:700">—</div>
+                    </div>
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:12px;
+                        background:var(--msg-ai);
+                        border-radius:10px;
+                        border:1px solid var(--border);
+                    ">
+                        <div>
+                            <div style="font-size:14px; font-weight:600">📅 Calendar Events</div>
+                            <div style="font-size:12px; color:#888">Synced from Google Calendar</div>
+                        </div>
+                        <div id="calendar-count" style="color:var(--accent); font-weight:700">—</div>
+                    </div>
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:12px;
+                        background:var(--msg-ai);
+                        border-radius:10px;
+                        border:1px solid var(--border);
+                    ">
+                        <div>
+                            <div style="font-size:14px; font-weight:600">😊 Mood Entries</div>
+                            <div style="font-size:12px; color:#888">Logged by you</div>
+                        </div>
+                        <div id="mood-count" style="color:var(--accent); font-weight:700">—</div>
+                    </div>
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:12px;
+                        background:var(--msg-ai);
+                        border-radius:10px;
+                        border:1px solid var(--border);
+                    ">
+                        <div>
+                            <div style="font-size:14px; font-weight:600">✅ Tasks</div>
+                            <div style="font-size:12px; color:#888">Created by you</div>
+                        </div>
+                        <div id="task-count" style="color:var(--accent); font-weight:700">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="card">
+                <div class="card-title">Privacy</div>
+                <div style="font-size:13px; color:#888; line-height:1.7">
+                    🔒 Your data is stored securely on Google Cloud Platform.<br>
+                    🚫 We never sell your data to third parties.<br>
+                    🤖 AI responses are generated by Google Gemini.<br>
+                    📧 Email access is read-only — we never send emails on your behalf.<br>
+                    🗑️ You can request full data deletion at any time.
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card" style="border-color:#ef444444">
+                <div class="card-title" style="color:#ef4444">Danger Zone</div>
+                <div style="font-size:13px; color:#888; margin-bottom:14px; line-height:1.5">
+                    These actions are permanent and cannot be undone.
+                </div>
+                <button onclick="confirmLogout()" style="
+                    width:100%;
+                    background:none;
+                    border:1px solid #ef4444;
+                    border-radius:10px;
+                    padding:11px;
+                    color:#ef4444;
+                    font-size:14px;
+                    cursor:pointer;
+                    font-family:inherit;
+                    margin-bottom:10px;
+                    transition:all 0.2s;
+                ">
+                    🚪 Sign Out
+                </button>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Persona Panel -->
+    <div class="panel" id="panel-persona">
+        <div class="scroll-panel">
+            <div class="persona-card">
+                <div class="persona-avatar">🎭</div>
+                <div class="persona-name" id="persona-name">Loading...</div>
+                <div class="persona-type" id="persona-type"></div>
+                <div class="persona-example" id="persona-example"></div>
+            </div>
+            <button class="action-btn" onclick="loadPersona()">🔄 Refresh Persona</button>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    const API = '';
+
+    // ── Format Response ────────────────────────────────
+    function formatResponse(text) {
+        // Convert **bold**
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent)">$1</strong>');
+        // Convert * bullet points
+        text = text.replace(/^\* (.+)$/gm, '<div class="bullet"><span class="bullet-dot">•</span><span>$1</span></div>');
+        // Convert numbered list
+        text = text.replace(/^(\d+)\. (.+)$/gm, '<div class="bullet"><span class="bullet-num">$1.</span><span>$2</span></div>');
+        // Headers with ##
+        text = text.replace(/^## (.+)$/gm, '<div class="resp-header">$1</div>');
+        // Double line break = paragraph gap
+        text = text.replace(/\n\n/g, '<div class="para-gap"></div>');
+        // Single line break
+        text = text.replace(/\n/g, '<br>');
+        return `<div class="formatted-response">${text}</div>`;
+    }
+
+    // ── Theme ──────────────────────────────────────────
+    function setTheme(theme) {
+        document.body.className = `theme-${theme}`;
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        document.querySelector(`.theme-dot.${theme}`).classList.add('active');
+        localStorage.setItem('theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'purple';
+    setTheme(savedTheme);
+
+    // ── Panel Navigation ───────────────────────────────
+    function showPanel(name) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`panel-${name}`).classList.add('active');
+        document.getElementById(`nav-${name}`).classList.add('active');
+
+        const titles = {
+            profile: ['My Profile', 'Your account and data'],
+            chat: ['Talk to Anya', 'Your personal wellness companion'],
+            mood: ['Mood & Signals', 'Track your emotional patterns'],
+            memory: ['My Memory', 'Search your second brain'],
+            persona: ['My Persona', 'Your comfort companion profile'],
+            tasks: ['My Tasks', 'Add tasks — Anya adds them to your calendar']
+        };
+        document.getElementById('header-title').textContent = titles[name][0];
+        document.getElementById('header-sub').textContent = titles[name][1];
+    }
+
+    // ── Auto resize textarea ───────────────────────────
+    function autoResize(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    // ── Chat ───────────────────────────────────────────
+    async function startChat() {
+        try {
+            const res = await fetch(`${API}/therapy/start`);
+            const data = await res.json();
+            addMessage(data.opening_message, 'ai', data.persona);
+        } catch(e) {
+            addMessage("Hi! I am Anya. How are you feeling today?", 'ai', 'Anya');
+        }
+    }
+
+    function addMessage(text, type, persona = null) {
+        const container = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        if (type === 'ai' && persona) {
+            div.innerHTML = `<div class="persona-tag">${persona}</div>${formatResponse(text)}`;
+        } else {
+            div.textContent = text;
+        }
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function showTyping() {
+        const container = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = 'typing';
+        div.id = 'typing-indicator';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function hideTyping() {
+        const el = document.getElementById('typing-indicator');
+        if (el) el.remove();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const btn = document.getElementById('send-btn');
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        input.value = '';
+        input.style.height = 'auto';
+        btn.disabled = true;
+        showTyping();
+
+        try {
+            const res = await fetch(`${API}/therapy/chat`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message, session_id: 'web_session'})
+            });
+            const data = await res.json();
+            hideTyping();
+            addMessage(data.response, data.flag === 'crisis' ? 'ai crisis' : 'ai', data.persona);
+        } catch(e) {
+            hideTyping();
+            addMessage("Something went wrong. Please try again.", 'ai');
+        }
+
+        btn.disabled = false;
+        input.focus();
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    // ── Mood ───────────────────────────────────────────
+    document.getElementById('mood-score').addEventListener('input', function() {
+        document.getElementById('score-display').textContent = this.value;
+    });
+
+    async function loadSignals() {
+        document.getElementById('signal-message').textContent = 'Scanning...';
+        try {
+            const res = await fetch(`${API}/signals/scan`);
+            const data = await res.json();
+            document.getElementById('email-score').textContent =
+                data.email_signals?.stress_score ?? '—';
+            document.getElementById('cal-score').textContent =
+                data.calendar_signals?.overload_score ?? '—';
+            document.getElementById('signal-message').textContent = data.message || '';
+        } catch(e) {
+            document.getElementById('signal-message').textContent = 'Failed to load signals';
+        }
+    }
+
+    async function logMood() {
+        const mood = document.getElementById('mood-select').value;
+        const score = parseInt(document.getElementById('mood-score').value);
+        const note = document.getElementById('mood-note').value;
+        try {
+            await fetch(`${API}/mood/log`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mood, score, note})
+            });
+            document.getElementById('mood-note').value = '';
+            alert('Mood logged!');
+        } catch(e) { alert('Failed to log mood'); }
+    }
+
+    async function analyzeMood() {
+        document.getElementById('mood-analysis-text').textContent = 'Analyzing...';
+        try {
+            const res = await fetch(`${API}/mood/analysis`);
+            const data = await res.json();
+            document.getElementById('mood-analysis-text').innerHTML =
+                formatResponse(data.analysis || 'No analysis available');
+        } catch(e) {
+            document.getElementById('mood-analysis-text').textContent = 'Failed to analyze';
+        }
+    }
+
+    // ── Memory ─────────────────────────────────────────
+    async function askMemory() {
+        const question = document.getElementById('memory-question').value.trim();
+        if (!question) return;
+        const result = document.getElementById('memory-result');
+        result.style.display = 'block';
+        result.innerHTML = '<div style="color:#888">Searching your memory...</div>';
+        try {
+            const res = await fetch(`${API}/ask`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({question})
+            });
+            const data = await res.json();
+            result.innerHTML = formatResponse(data.answer);
+        } catch(e) {
+            result.textContent = 'Failed to search memory';
+        }
+    }
+
+    async function quickAsk(question) {
+        document.getElementById('memory-question').value = question;
+        showPanel('memory');
+        await askMemory();
+    }
+    // ── Tasks ──────────────────────────────────────────
+    let recognition = null;
+    let isListening = false;
+
+    function setTaskInput(text) {
+        document.getElementById('task-input').value = text;
+        showPanel('tasks');
+    }
+
+    function toggleVoice() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert('Voice input not supported in this browser. Try Chrome!');
+            return;
+        }
+
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-IN';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            isListening = true;
+            document.getElementById('voice-btn').style.background = 'var(--accent-dark)';
+            document.getElementById('voice-btn').textContent = '⏹';
+            document.getElementById('voice-status').style.display = 'block';
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('task-input').value = transcript;
+            autoResize(document.getElementById('task-input'));
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            document.getElementById('voice-btn').style.background = 'var(--msg-ai)';
+            document.getElementById('voice-btn').textContent = '🎤';
+            document.getElementById('voice-status').style.display = 'none';
+        };
+
+        recognition.onerror = () => {
+            isListening = false;
+            document.getElementById('voice-btn').style.background = 'var(--msg-ai)';
+            document.getElementById('voice-btn').textContent = '🎤';
+            document.getElementById('voice-status').style.display = 'none';
+        };
+
+        recognition.start();
+    }
+
+    async function submitTask() {
+        const input = document.getElementById('task-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const result = document.getElementById('task-result');
+        const btn = document.getElementById('task-send-btn');
+
+        result.style.display = 'block';
+        result.innerHTML = '<span style="color:#888">⏳ Anya is processing your task...</span>';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/task/create', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message})
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                result.innerHTML = `
+                    <div style="color:#4ade80; font-weight:600; margin-bottom:8px">
+                        ✅ Added to Calendar!
+                    </div>
+                    <div><strong style="color:var(--accent)">${data.title}</strong></div>
+                    <div style="color:#888; font-size:13px; margin-top:4px">
+                        📅 ${data.date} ${data.time ? '⏰ ' + data.time : ''}
+                    </div>
+                `;
+                input.value = '';
+                input.style.height = 'auto';
+                loadTasks();
+            } else {
+                result.innerHTML = `
+                    <div style="color:#f59e0b">
+                        ⚠️ ${data.message || "Couldn't detect a task. Try being more specific!"}
+                    </div>
+                    <div style="color:#888; font-size:12px; margin-top:6px">
+                        Example: "Call mom Sunday at 5pm"
+                    </div>
+                `;
+            }
+        } catch(e) {
+            result.innerHTML = '<div style="color:#ef4444">❌ Something went wrong</div>';
+        }
+
+        btn.disabled = false;
+    }
+
+    async function loadTasks() {
+        try {
+            const res = await fetch('/task/list');
+            const data = await res.json();
+            const container = document.getElementById('task-list');
+
+            if (!data.tasks || data.tasks.length === 0) {
+                container.innerHTML = '<div style="color:#888; font-size:13px">No tasks yet — add one above!</div>';
+                return;
+            }
+
+            container.innerHTML = data.tasks.map(task => `
+                <div style="
+                    display:flex;
+                    gap:12px;
+                    align-items:flex-start;
+                    padding:12px;
+                    background:var(--msg-ai);
+                    border-radius:10px;
+                    margin-bottom:8px;
+                    border:1px solid var(--border);
+                ">
+                    <div style="
+                        width:36px; height:36px;
+                        background:var(--accent-dark);
+                        border-radius:8px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:18px;
+                        flex-shrink:0;
+                    ">📌</div>
+                    <div style="flex:1; min-width:0">
+                        <div style="font-size:14px; font-weight:600; margin-bottom:2px">
+                            ${task.title || 'Task'}
+                        </div>
+                        <div style="font-size:12px; color:#888">
+                            📅 ${task.date || 'No date'}
+                            ${task.time ? ' ⏰ ' + task.time : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch(e) {
+            document.getElementById('task-list').innerHTML =
+                '<div style="color:#888; font-size:13px">Failed to load tasks</div>';
+        }
+    }
+
+    // ── Profile ────────────────────────────────────────
+    async function loadProfile() {
+        try {
+            // Load persona
+            const res = await fetch('/persona/me');
+            const data = await res.json();
+            const p = data.persona;
+            document.getElementById('profile-persona-name').textContent = p.persona_name || 'Anya';
+            document.getElementById('profile-persona-type').textContent = p.persona_type || '';
+            document.getElementById('profile-persona-example').textContent = p.example_response || '';
+        } catch(e) {}
+
+        // Load data counts
+        try {
+            const collections = ['emails', 'calendar', 'mood_entries', 'tasks'];
+            const ids = ['email-count', 'calendar-count', 'mood-count', 'task-count'];
+
+            for (let i = 0; i < collections.length; i++) {
+                const res = await fetch(`/memories/${collections[i]}`);
+                const data = await res.json();
+                document.getElementById(ids[i]).textContent = data.data?.length || 0;
+            }
+        } catch(e) {}
+
+        // Load user info from localStorage
+        const name = localStorage.getItem('user_name') || 'User';
+        const email = localStorage.getItem('user_email') || '';
+        const joined = localStorage.getItem('joined_date') || new Date().toLocaleDateString('en-IN');
+
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('profile-email').textContent = email;
+        document.getElementById('profile-joined').textContent = `Joined ${joined}`;
+    }
+
+    function confirmLogout() {
+        if (confirm('Are you sure you want to sign out?')) {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+    }
+    // ── Persona ────────────────────────────────────────
+    async function loadPersona() {
+        try {
+            const res = await fetch(`${API}/persona/me`);
+            const data = await res.json();
+            const p = data.persona;
+            document.getElementById('persona-name').textContent = p.persona_name || 'Anya';
+            document.getElementById('persona-type').textContent = p.persona_type || '';
+            document.getElementById('persona-example').innerHTML =
+                formatResponse(p.example_response || '');
+        } catch(e) {
+            document.getElementById('persona-name').textContent = 'Anya';
+        }
+    }
+    function toggleChatVoice() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert('Voice input not supported. Try Chrome!');
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const r = new SpeechRecognition();
+        r.lang = 'en-IN';
+        r.continuous = false;
+
+        const btn = document.getElementById('chat-voice-btn');
+
+        r.onstart = () => {
+            btn.textContent = '⏹';
+            btn.style.background = 'var(--accent-dark)';
+        };
+
+        r.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('chat-input').value = transcript;
+            autoResize(document.getElementById('chat-input'));
+        };
+
+        r.onend = () => {
+            btn.textContent = '🎤';
+            btn.style.background = 'var(--msg-ai)';
+        };
+
+        r.start();
+    }
+    // ── Init ───────────────────────────────────────────
+    startChat();
+    loadSignals();
+    loadPersona();
+    loadTasks();
+    loadProfile();
+</script>
+
+</body>
+</html>
+<script>
+function formatText(text) {
+    return text
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Bullet points
+        .replace(/^\* (.+)/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul style="margin:10px 0 10px 20px; display:flex; flex-direction:column; gap:6px;">$1</ul>')
+        // Line breaks
+        .replace(/\n/g, '<br>');
+}
+</script>
+<script>
+function formatResponse(text) {
+    // Convert **bold**
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent)">$1</strong>');
+    // Convert * bullet points
+    text = text.replace(/^\* (.+)$/gm, '<div style="display:flex;gap:8px;margin:4px 0"><span style="color:var(--accent);margin-top:2px">•</span><span>$1</span></div>');
+    // Convert numbered lists
+    text = text.replace(/^\d+\. (.+)$/gm, '<div style="display:flex;gap:8px;margin:4px 0"><span style="color:var(--accent);font-weight:600;min-width:20px">$&</span></div>');
+    // Line breaks
+    text = text.replace(/\n\n/g, '<br><br>');
+    text = text.replace(/\n/g, '<br>');
+    return `<div style="line-height:1.8">${text}</div>`;
+}
+</script>

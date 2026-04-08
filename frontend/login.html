@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Brain AI — Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f1a;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+        }
+
+        /* ── Steps ── */
+        .step { display: none; }
+        .step.active { display: block; }
+
+        /* ── Logo ── */
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #a78bfa;
+        }
+
+        .logo-sub {
+            font-size: 13px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: #16162a;
+            border: 1px solid #2a2a4a;
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card-sub {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* ── Form ── */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #1e1e3a;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus { border-color: #a78bfa; }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            width: 100%;
+            background: #7c3aed;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover { background: #6d28d9; }
+        .btn-primary:disabled { background: #2a2a4a; cursor: not-allowed; }
+
+        .btn-google {
+            width: 100%;
+            background: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            color: #333;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .btn-google:hover { background: #f5f5f5; }
+
+        .divider {
+            text-align: center;
+            color: #555;
+            font-size: 12px;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #2a2a4a;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .toggle-auth span {
+            color: #a78bfa;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .toggle-auth span:hover { text-decoration: underline; }
+
+        /* ── Progress ── */
+        .progress {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2a2a4a;
+            transition: all 0.3s;
+        }
+
+        .progress-dot.active { background: #a78bfa; transform: scale(1.3); }
+        .progress-dot.done { background: #4ade80; }
+
+        /* ── Consent ── */
+        .consent-item {
+            background: #1e1e3a;
+            border: 1px solid #2a2a4a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .consent-item:hover { border-color: #a78bfa; }
+        .consent-item.checked { border-color: #4ade80; background: #1a2a1a; }
+
+        .consent-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+        }
+
+        .consent-item.checked .consent-checkbox {
+            background: #4ade80;
+            border-color: #4ade80;
+        }
+
+        .consent-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .consent-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        /* ── T&C ── */
+        .tnc-scroll {
+            background: #1e1e3a;
+            border: 1px solid #2a2a4a;
+            border-radius: 12px;
+            padding: 16px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #888;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .tnc-scroll h4 {
+            color: #fff;
+            margin: 12px 0 6px;
+            font-size: 13px;
+        }
+
+        .tnc-scroll::-webkit-scrollbar { width: 4px; }
+        .tnc-scroll::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 2px; }
+
+        /* ── Welcome ── */
+        .welcome-icon {
+            font-size: 64px;
+            text-align: center;
+            display: block;
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .error-msg {
+            background: #2a1a1a;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #ef4444;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .success-msg {
+            background: #1a2a1a;
+            border: 1px solid #4ade80;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #4ade80;
+            margin-bottom: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Logo -->
+    <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <div class="logo-text">Second Brain AI</div>
+        <div class="logo-sub">Your memory. Your wellbeing. Your companion.</div>
+    </div>
+
+    <!-- Step 1: Login/Register -->
+    <div class="step active" id="step-auth">
+        <div class="card">
+            <div class="card-title" id="auth-title">Welcome back</div>
+            <div class="card-sub" id="auth-sub">Sign in to access your second brain</div>
+
+            <div class="error-msg" id="error-msg"></div>
+            <div class="success-msg" id="success-msg"></div>
+
+            <!-- Google Login -->
+            <button class="btn-google" onclick="loginWithGoogle()">
+                <svg width="18" height="18" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+                    <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+                    <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+                    <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="divider">or</div>
+
+            <!-- Email/Password -->
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="email" placeholder="you@example.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="password" placeholder="••••••••">
+            </div>
+
+            <div class="form-group" id="name-group" style="display:none">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="fullname" placeholder="Your name">
+            </div>
+
+            <button class="btn-primary" id="auth-btn" onclick="handleAuth()">
+                Sign In
+            </button>
+
+            <div class="toggle-auth">
+                <span id="toggle-text">Don't have an account? </span>
+                <span onclick="toggleAuth()" id="toggle-link">Sign Up</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Terms & Conditions -->
+    <div class="step" id="step-tnc">
+        <div class="progress">
+            <div class="progress-dot done" id="dot1"></div>
+            <div class="progress-dot active" id="dot2"></div>
+            <div class="progress-dot" id="dot3"></div>
+            <div class="progress-dot" id="dot4"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Terms & Conditions</div>
+            <div class="card-sub">Please read and accept our terms before continuing</div>
+
+            <div class="tnc-scroll">
+                <h4>1. About Second Brain AI</h4>
+                Second Brain AI is a personal AI companion that helps you remember information and supports your mental wellbeing. We are not a medical service and do not provide clinical mental health treatment.
+
+                <h4>2. Data We Collect</h4>
+                We collect information you provide including emails (with your permission), calendar events, mood entries, and conversation history. This data is used solely to personalize your experience.
+
+                <h4>3. Mental Health Disclaimer</h4>
+                Second Brain AI is NOT a substitute for professional mental health care. If you are experiencing a mental health crisis, please contact a qualified professional or emergency services immediately.
+
+                <h4>4. Data Privacy</h4>
+                Your data is stored securely on Google Cloud Platform. We do not sell your data to third parties. You can request deletion of your data at any time.
+
+                <h4>5. AI Limitations</h4>
+                Our AI companions may make mistakes. Do not rely solely on AI advice for important decisions. Always consult qualified professionals for medical, legal, or financial matters.
+
+                <h4>6. User Responsibilities</h4>
+                You agree to use this service responsibly and not to misuse the AI companion feature. You must be 18 or older to use this service.
+
+                <h4>7. Changes to Terms</h4>
+                We may update these terms periodically. Continued use of the service constitutes acceptance of updated terms.
+            </div>
+
+            <div class="consent-item" id="tnc-check" onclick="toggleTnc()">
+                <div class="consent-checkbox" id="tnc-box">✓</div>
+                <div>
+                    <div class="consent-title">I have read and agree to the Terms & Conditions</div>
+                    <div class="consent-desc">You must accept the terms to use Second Brain AI</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="tnc-btn" onclick="nextStep(3)" disabled>
+                Continue →
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 3: Mental Health Consent -->
+    <div class="step" id="step-consent">
+        <div class="progress">
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Your Consent Matters 💙</div>
+            <div class="card-sub">Second Brain AI handles sensitive personal data. Please confirm your understanding.</div>
+
+            <div class="consent-item" id="c1" onclick="toggleConsent('c1')">
+                <div class="consent-checkbox">✓</div>
+                <div>
+                    <div class="consent-title">AI is not a therapist</div>
+                    <div class="consent-desc">I understand that Anya is an AI companion, not a licensed mental health professional, and cannot replace professional therapy.</div>
+                </div>
+            </div>
+
+            <div class="consent-item" id="c2" onclick="toggleConsent('c2')">
+                <div class="consent-checkbox">✓</div>
+                <div>
+                    <div class="consent-title">My data stays private</div>
+                    <div class="consent-desc">I consent to my mood, email, and calendar data being stored securely to personalize my experience.</div>
+                </div>
+            </div>
+
+            <div class="consent-item" id="c3" onclick="toggleConsent('c3')">
+                <div class="consent-checkbox">✓</div>
+                <div>
+                    <div class="consent-title">I will seek help if needed</div>
+                    <div class="consent-desc">If I experience a mental health crisis, I will contact a qualified professional or emergency services.</div>
+                </div>
+            </div>
+
+            <div class="consent-item" id="c4" onclick="toggleConsent('c4')">
+                <div class="consent-checkbox">✓</div>
+                <div>
+                    <div class="consent-title">I am 18 or older</div>
+                    <div class="consent-desc">I confirm that I am at least 18 years of age and legally able to consent to these terms.</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="consent-btn" onclick="nextStep(4)" disabled style="margin-top:16px">
+                I Understand & Agree →
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 4: Welcome -->
+    <div class="step" id="step-welcome">
+        <div class="progress">
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot active"></div>
+        </div>
+        <div class="card" style="text-align:center">
+            <span class="welcome-icon">🎉</span>
+            <div class="card-title" style="margin-bottom:8px">You're all set!</div>
+            <div class="card-sub" style="margin-bottom:24px">
+                Welcome to Second Brain AI. Anya is ready to meet you and help you remember your life and care for your wellbeing.
+            </div>
+            <button class="btn-primary" onclick="enterApp()">
+                Meet Anya →
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider,
+        onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+    // ── PASTE YOUR FIREBASE CONFIG HERE ──
+    const firebaseConfig = {
+    apiKey: "AIzaSyCcbuWV0RiRkusBT7_VwJmcnzmnQzOvFRI",
+    authDomain: "second-brain-ai-2026.firebaseapp.com",
+    projectId: "second-brain-ai-2026",
+    storageBucket: "second-brain-ai-2026.firebasestorage.app",
+    messagingSenderId: "501614017833",
+    appId: "1:501614017833:web:64eb2a4e940a9d43b44b38",
+    measurementId: "G-VCMGJXPBLE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+        if (user && localStorage.getItem('consent_given')) {
+            // Only redirect if we're on login page
+            if (window.location.pathname === '/login') {
+                window.location.href = '/ui';
+            }
+        }
+    });
+
+    let isSignUp = false;
+
+    window.toggleAuth = function() {
+        isSignUp = !isSignUp;
+        document.getElementById('auth-title').textContent = isSignUp ? 'Create account' : 'Welcome back';
+        document.getElementById('auth-sub').textContent = isSignUp ? 'Join Second Brain AI today' : 'Sign in to access your second brain';
+        document.getElementById('auth-btn').textContent = isSignUp ? 'Create Account' : 'Sign In';
+        document.getElementById('toggle-link').textContent = isSignUp ? 'Sign In' : 'Sign Up';
+        document.getElementById('toggle-text').textContent = isSignUp ? 'Already have an account? ' : "Don't have an account? ";
+        document.getElementById('name-group').style.display = isSignUp ? 'block' : 'none';
+    }
+
+    window.handleAuth = async function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('auth-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        if (!email || !password) {
+            showError('Please fill in all fields');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Please wait...';
+        errorMsg.style.display = 'none';
+
+        try {
+            if (isSignUp) {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+            nextStep(2);
+        } catch(e) {
+            showError(getErrorMessage(e.code));
+            btn.disabled = false;
+            btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+        }
+    }
+
+    window.loginWithGoogle = async function() {
+        try {
+            await signInWithPopup(auth, provider);
+            nextStep(2);
+        } catch(e) {
+            showError(getErrorMessage(e.code));
+        }
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-msg');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function getErrorMessage(code) {
+        const messages = {
+            'auth/user-not-found': 'No account found with this email',
+            'auth/wrong-password': 'Incorrect password',
+            'auth/email-already-in-use': 'Email already registered',
+            'auth/weak-password': 'Password must be at least 6 characters',
+            'auth/invalid-email': 'Invalid email address',
+            'auth/popup-closed-by-user': 'Google sign in was cancelled'
+        };
+        return messages[code] || 'Something went wrong. Please try again.';
+    }
+
+    window.enterApp = function() {
+        localStorage.setItem('consent_given', 'true');
+        localStorage.setItem('joined_date', new Date().toLocaleDateString('en-IN'));
+        window.location.href = '/ui';
+    }
+    // After successful Google login
+    const user = auth.currentUser;
+    localStorage.setItem('user_name', user.displayName || 'User');
+    localStorage.setItem('user_email', user.email || '');
+
+    // After successful email login
+    localStorage.setItem('user_email', email);
+
+</script>
+
+<script>
+    let tncChecked = false;
+    let consentChecked = { c1: false, c2: false, c3: false, c4: false };
+
+    function nextStep(step) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(`step-${['auth','tnc','consent','welcome'][step-1]}`).classList.add('active');
+    }
+
+    function toggleTnc() {
+        tncChecked = !tncChecked;
+        const item = document.getElementById('tnc-check');
+        const btn = document.getElementById('tnc-btn');
+        item.classList.toggle('checked', tncChecked);
+        btn.disabled = !tncChecked;
+    }
+
+    function toggleConsent(id) {
+        consentChecked[id] = !consentChecked[id];
+        const item = document.getElementById(id);
+        item.classList.toggle('checked', consentChecked[id]);
+
+        const allChecked = Object.values(consentChecked).every(v => v);
+        document.getElementById('consent-btn').disabled = !allChecked;
+    }
+
+    window.nextStep = nextStep;
+    window.toggleTnc = toggleTnc;
+    window.toggleConsent = toggleConsent;
+</script>
+
+</body>
+</html>

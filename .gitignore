@@ -1,0 +1,9 @@
+venv/
+.env
+credentials.json
+oauth_credentials.json
+token_gmail.json
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/

@@ -1,0 +1,85 @@
+{
+  "emails": [
+    {
+      "id": "email_1",
+      "from": "raj@company.com",
+      "subject": "Project deadline extended",
+      "body": "Hey, the deadline for the AI project has been extended to next Friday. Please update your tasks accordingly.",
+      "date": "2024-01-15",
+      "tags": ["work", "deadline", "project"]
+    },
+    {
+      "id": "email_2",
+      "from": "mom@gmail.com",
+      "subject": "Family dinner this Sunday",
+      "body": "Don't forget family dinner this Sunday at 7pm. Your cousin is visiting from Mumbai.",
+      "date": "2024-01-16",
+      "tags": ["family", "personal"]
+    },
+    {
+      "id": "email_3",
+      "from": "hr@company.com",
+      "subject": "Performance review scheduled",
+      "body": "Your performance review is scheduled for next Monday at 10am. Please prepare your self assessment.",
+      "date": "2024-01-17",
+      "tags": ["work", "review", "important"]
+    }
+  ],
+  "calendar": [
+    {
+      "id": "cal_1",
+      "title": "Team standup",
+      "date": "2024-01-18",
+      "time": "9:00 AM",
+      "attendees": ["raj", "priya", "amit"],
+      "notes": "Discuss sprint progress"
+    },
+    {
+      "id": "cal_2",
+      "title": "Performance review",
+      "date": "2024-01-22",
+      "time": "10:00 AM",
+      "attendees": ["manager"],
+      "notes": "Prepare self assessment beforehand"
+    }
+  ],
+  "notes": [
+    {
+      "id": "note_1",
+      "title": "Book recommendation",
+      "content": "Read Atomic Habits — great for building consistency",
+      "date": "2024-01-10",
+      "tags": ["learning", "books"]
+    },
+    {
+      "id": "note_2",
+      "title": "Feeling overwhelmed",
+      "content": "Too many deadlines at once. Feeling anxious about performance review. Need to manage time better.",
+      "date": "2024-01-17",
+      "tags": ["mental_health", "stress", "anxiety"]
+    }
+  ],
+  "mood_entries": [
+    {
+      "id": "mood_1",
+      "date": "2024-01-15",
+      "mood": "neutral",
+      "score": 5,
+      "note": "Normal day, nothing special"
+    },
+    {
+      "id": "mood_2",
+      "date": "2024-01-16",
+      "mood": "anxious",
+      "score": 3,
+      "note": "Worried about performance review"
+    },
+    {
+      "id": "mood_3",
+      "date": "2024-01-17",
+      "mood": "stressed",
+      "score": 2,
+      "note": "Too many things at once"
+    }
+  ]
+}
